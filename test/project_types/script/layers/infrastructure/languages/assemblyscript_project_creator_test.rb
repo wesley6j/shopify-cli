@@ -89,7 +89,6 @@ describe Script::Layers::Infrastructure::Languages::AssemblyScriptProjectCreator
       extension_point.expects(:sdks).times(4).returns(stub(all: [sdk], assemblyscript: sdk))
 
       # moving files up to project root
-      type = extension_point.type
       source = File.join(project_creator.path_to_project, project_creator.sparse_checkout_set_path)
       FileUtils.expects(:copy_entry).with(source, project_creator.path_to_project)
 
