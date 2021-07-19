@@ -53,13 +53,14 @@ module Script
         end
 
         class ExtensionPointSDK
-          attr_reader :version, :beta, :package, :repo
+          attr_reader :version, :beta, :package, :repo, :origin_branch
 
           def initialize(config)
             @beta = config["beta"] || false
             @package = config["package"]
             @version = config["package-version"]
             @repo = config["repo"]
+            @origin_branch = config["origin-branch"]
           end
 
           def beta?

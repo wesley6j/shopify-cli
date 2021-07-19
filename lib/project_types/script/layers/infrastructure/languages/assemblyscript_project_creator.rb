@@ -35,7 +35,7 @@ module Script
           end
 
           def origin_branch
-            ORIGIN_BRANCH
+            extension_point.sdks.assemblyscript.origin_branch || ORIGIN_BRANCH
           end
 
           def sparse_checkout_set_path
@@ -45,7 +45,7 @@ module Script
             if domain.nil?
               "packages/default/extension-point-as-#{type}/assembly/sample"
             else
-              "packages/#{domain}/samples/#{type}"
+              "#{domain}/assemblyscript/example-scripts/#{type}/default"
             end
           end
 
@@ -66,7 +66,7 @@ module Script
           end
 
           def pull
-            command_runner.call("git pull origin #{ORIGIN_BRANCH}")
+            command_runner.call("git pull origin #{origin_branch}")
           end
 
           def clean
