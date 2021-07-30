@@ -17,7 +17,7 @@ module ShopifyCli
         shop = (options.flags[:shop] || @ctx.getenv("SHOPIFY_SHOP" || nil))
         ShopifyCli::DB.set(shop: self.class.validate_shop(shop)) unless shop.nil?
 
-        if shop.nil? && Shopifolk.check
+        if shop.nil? && Shopifolk.check && !@ctx.ci?
           Shopifolk.reset
           @ctx.puts(@ctx.message("core.tasks.select_org_and_shop.identified_as_shopify"))
           message = @ctx.message("core.tasks.select_org_and_shop.first_party")
@@ -29,6 +29,10 @@ module ShopifyCli
         # As password auth will soon be deprecated, we enable only in CI
         if @ctx.ci? && (password = options.flags[:password] || @ctx.getenv("SHOPIFY_PASSWORD"))
           ShopifyCli::DB.set(shopify_exchange_token: password)
+        elsif @ctx.ci? && (org_id = @ctx.getenv("PARTNERS_ORG_ID")) && (exchange_token = @ctx.getenv("PARTNERS_EXCHANGE_TOKEN"))
+          ShopifyCli::DB.set(organization_id: org_id.to_i)
+          ShopifyCli::DB.set(partners_exchange_token: exchange_token)
+          Whoami.call([], "whoami")
         else
           IdentityAuth.new(ctx: @ctx).authenticate
           org = select_organization
