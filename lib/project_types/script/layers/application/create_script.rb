@@ -31,6 +31,8 @@ module Script
 
           def install_dependencies(ctx, language, script_name, project_creator)
             task_runner = Infrastructure::Languages::TaskRunner.for(ctx, language, script_name)
+            task_runner.check_system_dependencies!
+
             project_creator.setup_dependencies
             ProjectDependencies.install(ctx: ctx, task_runner: task_runner)
           end

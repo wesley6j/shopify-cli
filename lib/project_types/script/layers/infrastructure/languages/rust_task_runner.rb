@@ -9,13 +9,18 @@ module Script
           BUILD_TARGET = "wasm32-unknown-unknown"
           METADATA_FILE = "build/metadata.json"
           CARGO_BUILD_CMD = "cargo build --target=#{BUILD_TARGET} --release"
+          MIN_CARGO_VERSION = "1.50"
 
           def initialize(ctx, _)
             @ctx = ctx
           end
 
-          def dependencies_installed?
+          def project_dependencies_installed?
             true
+          end
+
+          def check_system_dependencies!
+            check_tool_version!("cargo", MIN_CARGO_VERSION)
           end
 
           def install_dependencies
@@ -53,6 +58,20 @@ module Script
 
             ctx.binread(binary_path)
           end
+
+          def check_tool_version!(tool, min_required_verison)
+            output, status = @ctx.capture2e(tool, "--version")
+            raise Errors::DependencyInstallError, output unless status.success?
+
+            require "semantic/semantic"
+            version = ::Semantic::Version.new(output[1..-1])
+            unless version >= ::Semantic::Version.new(min_required_verison)
+              raise Errors::DependencyInstallError,
+                    "#{tool} version must be >= v#{min_required_verison}. "\
+                    "Current version: #{output.strip}."
+            end
+          end
+
         end
       end
     end
