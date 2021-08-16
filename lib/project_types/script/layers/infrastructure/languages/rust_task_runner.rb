@@ -67,11 +67,10 @@ module Script
             version = ::Semantic::Version.new(output[1..-1])
             unless version >= ::Semantic::Version.new(min_required_verison)
               raise Errors::DependencyInstallError,
-                    "#{tool} version must be >= v#{min_required_verison}. "\
-                    "Current version: #{output.strip}."
+                "#{tool} version must be >= v#{min_required_verison}. "\
+                "Current version: #{output.strip}."
             end
           end
-
         end
       end
     end
