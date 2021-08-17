@@ -115,8 +115,8 @@ describe Script::Layers::Infrastructure::Languages::RustTaskRunner do
     describe "when cargo version is below minimum" do
       it "should raise error" do
         ctx.expects(:capture2e)
-           .with("cargo", "--version")
-           .returns(["1.49.0", mock(success?: true)])
+          .with("cargo", "--version")
+          .returns(["1.49.0", mock(success?: true)])
 
         assert_raises Script::Layers::Infrastructure::Errors::MissingDependencyError do
           subject
@@ -127,8 +127,8 @@ describe Script::Layers::Infrastructure::Languages::RustTaskRunner do
     describe "when cargo version is above minimum" do
       it "should install successfully" do
         ctx.expects(:capture2e)
-           .with("cargo", "--version")
-           .returns(["1.50.1", mock(success?: true)])
+          .with("cargo", "--version")
+          .returns(["1.50.1", mock(success?: true)])
         subject
       end
     end
