@@ -108,4 +108,29 @@ describe Script::Layers::Infrastructure::Languages::RustTaskRunner do
       end
     end
   end
+
+  describe ".check_system_dependencies!" do
+    subject { rs_task_runner.check_system_dependencies! }
+
+    describe "when cargo version is below minimum" do
+      it "should raise error" do
+        ctx.expects(:capture2e)
+           .with("cargo", "--version")
+           .returns(["1.49.0", mock(success?: true)])
+
+        assert_raises Script::Layers::Infrastructure::Errors::MissingDependencyError do
+          subject
+        end
+      end
+    end
+
+    describe "when cargo version is above minimum" do
+      it "should install successfully" do
+        ctx.expects(:capture2e)
+           .with("cargo", "--version")
+           .returns(["1.50.1", mock(success?: true)])
+        subject
+      end
+    end
+  end
 end

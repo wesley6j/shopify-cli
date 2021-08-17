@@ -9,7 +9,7 @@ module Script
           BUILD_TARGET = "wasm32-unknown-unknown"
           METADATA_FILE = "build/metadata.json"
           CARGO_BUILD_CMD = "cargo build --target=#{BUILD_TARGET} --release"
-          MIN_CARGO_VERSION = "1.50"
+          MIN_CARGO_VERSION = "1.50.0"
 
           def initialize(ctx, _)
             @ctx = ctx
@@ -61,13 +61,17 @@ module Script
 
           def check_tool_version!(tool, min_required_verison)
             output, status = @ctx.capture2e(tool, "--version")
-            raise Errors::DependencyInstallError, output unless status.success?
+            unless status.success?
+              raise Errors::MissingDependencyError,
+                    "#{tool} version must be >= v#{min_required_verison}. "\
+                "No version of #{tool} installed."
+            end
 
             require "semantic/semantic"
-            version = ::Semantic::Version.new(output[1..-1])
+            version = ::Semantic::Version.new(output.gsub(/^v/, ""))
             unless version >= ::Semantic::Version.new(min_required_verison)
-              raise Errors::DependencyInstallError,
-                "#{tool} version must be >= v#{min_required_verison}. "\
+              raise Errors::MissingDependencyError,
+                    "#{tool} version must be >= v#{min_required_verison}. "\
                 "Current version: #{output.strip}."
             end
           end
