@@ -59,20 +59,16 @@ module Script
             ctx.binread(binary_path)
           end
 
-          def check_tool_version!(tool, min_required_verison)
+          def check_tool_version!(tool, min_required_version)
             output, status = @ctx.capture2e(tool, "--version")
             unless status.success?
-              raise Errors::MissingDependencyError,
-                "#{tool} version must be >= v#{min_required_verison}. "\
-            "No version of #{tool} installed."
+              raise Errors::NoDependencyInstalledError.new(tool, min_required_version)
             end
 
             require "semantic/semantic"
             version = ::Semantic::Version.new(output.gsub(/^v/, ""))
-            unless version >= ::Semantic::Version.new(min_required_verison)
-              raise Errors::MissingDependencyError,
-                "#{tool} version must be >= v#{min_required_verison}. "\
-            "Current version: #{output.strip}."
+            unless version >= ::Semantic::Version.new(min_required_version)
+              raise Errors::MissingDependencyVersionError.new(tool, output.strip, min_required_version)
             end
           end
         end

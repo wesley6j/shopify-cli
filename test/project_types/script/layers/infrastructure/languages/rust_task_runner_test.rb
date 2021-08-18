@@ -112,13 +112,24 @@ describe Script::Layers::Infrastructure::Languages::RustTaskRunner do
   describe ".check_system_dependencies!" do
     subject { rs_task_runner.check_system_dependencies! }
 
+    describe "when card is not installed" do
+      it "should raise error" do
+        ctx.expects(:capture2e)
+           .with("cargo", "--version")
+           .returns([nil, mock(success?: false)])
+        assert_raises Script::Layers::Infrastructure::Errors::NoDependencyInstalledError do
+          subject
+        end
+      end
+    end
+
     describe "when cargo version is below minimum" do
       it "should raise error" do
         ctx.expects(:capture2e)
           .with("cargo", "--version")
           .returns(["1.49.0", mock(success?: true)])
 
-        assert_raises Script::Layers::Infrastructure::Errors::MissingDependencyError do
+        assert_raises Script::Layers::Infrastructure::Errors::MissingDependencyVersionError do
           subject
         end
       end
