@@ -40,6 +40,7 @@ module Script
           end
         end
 
+        class APILibraryNotFoundError < ScriptProjectError; end
         class DependencyInstallError < ScriptProjectError; end
         class DeprecatedEPError < ScriptProjectError; end
         class EmptyResponseError < ScriptProjectError; end

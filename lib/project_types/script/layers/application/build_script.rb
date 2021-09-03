@@ -6,6 +6,10 @@ module Script
       class BuildScript
         class << self
           def call(ctx:, task_runner:, script_project:)
+            extension_point = ExtensionPoints.get(type: script_project.extension_point_type)
+            # TODO: Replace with with the sdks.for method from the sparse_checkout PR
+            library_name = extension_point.sdks.all.find { |ep| ep.class.language == script_project.language }.package
+
             CLI::UI::Frame.open(ctx.message("script.application.building")) do
               begin
                 UI::StrictSpinner.spin(ctx.message("script.application.building_script")) do |spinner|
@@ -14,6 +18,7 @@ module Script
                     script_content: task_runner.build,
                     compiled_type: task_runner.compiled_type,
                     metadata: task_runner.metadata,
+                    library_version: task_runner.library_version(library_name),
                   )
                   spinner.update_title(ctx.message("script.application.built"))
                 end

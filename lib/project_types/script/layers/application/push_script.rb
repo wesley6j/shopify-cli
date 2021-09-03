@@ -14,11 +14,16 @@ module Script
             ProjectDependencies.install(ctx: ctx, task_runner: task_runner)
             BuildScript.call(ctx: ctx, task_runner: task_runner, script_project: script_project)
 
+            extension_point = ExtensionPoints.get(type: script_project.extension_point_type)
+            # TODO: Replace with with the sdks.for method from the sparse_checkout PR
+            library_name = extension_point.sdks.all.find { |ep| ep.class.language == script_project.language }.package
+
             UI::PrintingSpinner.spin(ctx, ctx.message("script.application.pushing")) do |p_ctx, spinner|
               package = Infrastructure::PushPackageRepository.new(ctx: p_ctx).get_push_package(
                 script_project: script_project,
                 compiled_type: task_runner.compiled_type,
                 metadata: task_runner.metadata,
+                library_version: task_runner.library_version(library_name),
               )
               script_service = Infrastructure::ServiceLocator.script_service(
                 ctx: p_ctx,
@@ -32,6 +37,8 @@ module Script
                 metadata: package.metadata,
                 script_json: package.script_json,
                 module_upload_url: module_upload_url,
+                library_language: package.library_language,
+                library_version: package.library_version,
               )
               script_project_repo.update_env(uuid: uuid)
               spinner.update_title(p_ctx.message("script.application.pushed"))

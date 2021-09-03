@@ -122,6 +122,64 @@ describe Script::Layers::Infrastructure::Languages::AssemblyScriptTaskRunner do
     end
   end
 
+  describe ".library_version" do
+    subject { as_task_runner.library_version(extension_point_config["assemblyscript"][:package]) }
+
+    describe "when the package is in the dependencies list" do
+      it "should return a valid version number" do
+        ctx.expects(:capture2e)
+          .with("npm list --json")
+          .returns(
+            [
+              {
+                "dependencies" => {
+                  extension_point_config["assemblyscript"][:package] => {
+                    "version" => "1.3.7",
+                  },
+                },
+              }.to_json,
+              mock(success?: true),
+            ]
+          )
+        assert_equal "1.3.7", subject
+      end
+    end
+
+    describe "when the package is not in the dependencies list" do
+      it "should return a an error" do
+        ctx.expects(:capture2e)
+          .with("npm list --json")
+          .returns(
+            [
+              {
+                "dependencies" => {},
+              }.to_json,
+              mock(success?: true),
+            ]
+          )
+        assert_raises Script::Layers::Infrastructure::Errors::APILibraryNotFoundError do
+          subject
+        end
+      end
+    end
+
+    describe "npm list command fails" do
+      it "should return a an error" do
+        ctx.expects(:capture2e)
+          .with("npm list --json")
+          .returns(
+            [
+              "",
+              mock(success?: false),
+            ]
+          )
+        assert_raises Script::Layers::Infrastructure::Errors::SystemCallFailureError do
+          subject
+        end
+      end
+    end
+  end
+
   describe ".install_dependencies" do
     subject { as_task_runner.install_dependencies }
 
@@ -196,3 +254,4 @@ describe Script::Layers::Infrastructure::Languages::AssemblyScriptTaskRunner do
     end
   end
 end
+#

@@ -12,8 +12,31 @@ describe Script::Layers::Application::BuildScript do
     let(:content) { "content" }
     let(:compiled_type) { "wasm" }
     let(:metadata) { Script::Layers::Domain::Metadata.new("1", "0", false) }
+    let(:library_version) { "1.0.0" }
     let(:task_runner) { stub(compiled_type: compiled_type, metadata: metadata) }
     let(:script_project) { stub }
+
+    let(:extension_point_repository) { TestHelpers::FakeExtensionPointRepository.new }
+    let(:ep) { extension_point_repository.get_extension_point(extension_point_type) }
+
+    before do
+      task_runner
+        .stubs(:library_version)
+        .returns("1.0.0")
+
+      extension_point_repository.create_extension_point(extension_point_type)
+      Script::Layers::Application::ExtensionPoints
+        .expects(:get)
+        .with(type: extension_point_type)
+        .returns(ep)
+
+      script_project
+        .expects(:extension_point_type)
+        .returns(extension_point_type)
+      script_project
+        .expects(:language)
+        .returns(language)
+    end
 
     subject do
       Script::Layers::Application::BuildScript.call(
@@ -31,7 +54,8 @@ describe Script::Layers::Application::BuildScript do
           script_project: script_project,
           script_content: content,
           compiled_type: "wasm",
-          metadata: metadata
+          metadata: metadata,
+          library_version: library_version
         )
         capture_io { subject }
       end

@@ -242,6 +242,11 @@ module Script
             cause_of_error: ShopifyCLI::Context.message("script.error.script_upload_cause"),
             help_suggestion: ShopifyCLI::Context.message("script.error.script_upload_help"),
           }
+        when Layers::Infrastructure::Errors::APILibraryNotFoundError
+          {
+            cause_of_error: ShopifyCli::Context.message("script.error.api_library_not_found_cause"),
+            help_suggestion: ShopifyCli::Context.message("script.error.api_library_not_found_help"),
+          }
         end
       end
     end

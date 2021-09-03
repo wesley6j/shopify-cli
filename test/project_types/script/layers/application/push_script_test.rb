@@ -6,12 +6,13 @@ describe Script::Layers::Application::PushScript do
   include TestHelpers::FakeFS
 
   let(:compiled_type) { "wasm" }
-  let(:language) { "AssemblyScript" }
+  let(:language) { "assemblyscript" }
   let(:api_key) { "api_key" }
   let(:force) { true }
   let(:use_msgpack) { true }
   let(:extension_point_type) { "discount" }
   let(:metadata) { Script::Layers::Domain::Metadata.new("1", "0", use_msgpack) }
+  let(:library_version) { "1.0.0" }
   let(:schema_minor_version) { "0" }
   let(:script_name) { "name" }
   let(:script_project) do
@@ -38,12 +39,17 @@ describe Script::Layers::Application::PushScript do
       .stubs(:for)
       .with(@context, language, script_name)
       .returns(task_runner)
+    task_runner
+      .expects(:library_version)
+      .returns("1.0.0")
+
     extension_point_repository.create_extension_point(extension_point_type)
     push_package_repository.create_push_package(
       script_project: script_project,
       script_content: "content",
       compiled_type: compiled_type,
-      metadata: metadata
+      metadata: metadata,
+      library_version: library_version
     )
   end
 

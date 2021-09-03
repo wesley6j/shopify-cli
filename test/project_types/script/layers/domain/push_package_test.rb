@@ -12,6 +12,8 @@ describe Script::Layers::Domain::PushPackage do
   let(:script_content) { "(module)" }
   let(:compiled_type) { "wasm" }
   let(:metadata) { Script::Layers::Domain::Metadata.new("1", "0", true) }
+  let(:library_language) { "assemblyscript" }
+  let(:library_version) { "1.0.0" }
   let(:push_package) do
     Script::Layers::Domain::PushPackage.new(
       id: id,
@@ -20,7 +22,9 @@ describe Script::Layers::Domain::PushPackage do
       script_json: script_json,
       script_content: script_content,
       compiled_type: compiled_type,
-      metadata: metadata
+      metadata: metadata,
+      library_language: library_language,
+      library_version: library_version,
     )
   end
   let(:script_service) { Minitest::Mock.new }

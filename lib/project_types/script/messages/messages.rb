@@ -144,6 +144,9 @@ module Script
 
           script_upload_cause: "Fail to upload script.",
           script_upload_help: "Try again.",
+
+          api_library_not_found_cause: "Failed to find API Library in dependencies.",
+          api_library_not_found_help: "Try re-installing project dependencies.",
         },
 
         create: {
