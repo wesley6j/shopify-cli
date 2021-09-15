@@ -57,12 +57,12 @@ module ShopifyCli
         end
 
         def call(_args, _name)
-          is_enabled = ShopifyCli::Config.get_bool("analytics", "enabled")
+          is_enabled = ShopifyCli::DB.get(ShopifyCli::Constants::StoreKeys::ANALYTICS_ENABLED)
           if options.flags[:action] == "disable" && is_enabled
-            ShopifyCli::Config.set("analytics", "enabled", false)
+            ShopifyCli::DB.set(ShopifyCli::Constants::StoreKeys::ANALYTICS_ENABLED => false)
             @ctx.puts(@ctx.message("core.config.analytics.disabled"))
           elsif options.flags[:action] == "enable" && !is_enabled
-            ShopifyCli::Config.set("analytics", "enabled", true)
+            ShopifyCli::DB.set(ShopifyCli::Constants::StoreKeys::ANALYTICS_ENABLED => true)
             @ctx.puts(@ctx.message("core.config.analytics.enabled"))
           elsif is_enabled
             @ctx.puts(@ctx.message("core.config.analytics.is_enabled"))

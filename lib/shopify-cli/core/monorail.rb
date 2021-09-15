@@ -50,16 +50,16 @@ module ShopifyCli
         end
 
         def consented?
-          ShopifyCli::Config.get_bool("analytics", "enabled")
+          ShopifyCli::DB.get(Constants::StoreKeys::ANALYTICS_ENABLED) || false
         end
 
         def prompt_for_consent
           return if Context.new.ci?
           return unless enabled?
-          return if ShopifyCli::Config.get_section("analytics").key?("enabled")
+          return if ShopifyCli::DB.exists?(Constants::StoreKeys::ANALYTICS_ENABLED)
           msg = Context.message("core.monorail.consent_prompt")
           opt = CLI::UI::Prompt.confirm(msg)
-          ShopifyCli::Config.set("analytics", "enabled", opt)
+          ShopifyCli::DB.set(Constants::StoreKeys::ANALYTICS_ENABLED => opt)
         end
 
         def send_event(start_time, commands, args, err = nil)

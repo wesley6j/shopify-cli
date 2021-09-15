@@ -25,6 +25,7 @@ require "cli/ui"
 require "cli/kit"
 require "smart_properties"
 require_relative "shopify-cli/version"
+require_relative "shopify-cli/migrator"
 
 # Enable stdout routing. At this point all calls to STDOUT (and STDERR) will go through this class.
 # See https://github.com/Shopify/cli-ui/blob/main/lib/cli/ui/stdout_router.rb for more info
@@ -94,6 +95,7 @@ module ShopifyCli
     )
   end
 
+  autoload :Migrator, "shopify-cli/migrator"
   autoload :Constants, "shopify-cli/constants"
   autoload :Environment, "shopify-cli/environment"
   autoload :AdminAPI, "shopify-cli/admin_api"
@@ -130,11 +132,12 @@ module ShopifyCli
   autoload :TransformDataStructure, "shopify-cli/transform_data_structure"
   autoload :Tunnel, "shopify-cli/tunnel"
 
+  # Messages
   require "shopify-cli/messages/messages"
   Context.load_messages(ShopifyCli::Messages::MESSAGES)
 
   def self.cache_dir
-    cache_dir = if Environment.running_tests?
+    cache_dir = if Environment.test?
       TEMP_DIR
     elsif ENV["LOCALAPPDATA"].nil?
       File.join(File.expand_path(ENV.fetch("XDG_CACHE_HOME", "~/.cache")), TOOL_NAME)
@@ -149,7 +152,7 @@ module ShopifyCli
   end
 
   def self.tool_config_path
-    if Environment.running_tests?
+    if Environment.test?
       TEMP_DIR
     elsif ENV["APPDATA"].nil?
       File.join(File.expand_path(ENV.fetch("XDG_CONFIG_HOME", "~/.config")), TOOL_NAME)
@@ -169,5 +172,11 @@ module ShopifyCli
   def self.sha
     return @sha if defined?(@sha)
     @sha = Git.sha(dir: ShopifyCli::ROOT)
+  end
+
+  # Migrate runs migrations that migrate the state of the environment
+  # in which the CLI runs.
+  unless ShopifyCli::Environment.test? || ShopifyCli::Environment.development?
+    ShopifyCli::Migrator.migrate
   end
 end

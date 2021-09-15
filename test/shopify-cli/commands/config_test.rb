@@ -52,15 +52,27 @@ module ShopifyCli
       end
 
       def test_will_enable_analytics_that_is_disabled
-        ShopifyCli::Config.set("analytics", "enabled", false)
+        # Given
+        ShopifyCli::DB.expects(:get)
+          .with(ShopifyCli::Constants::StoreKeys::ANALYTICS_ENABLED)
+          .returns(false)
+        ShopifyCli::DB.expects(:set)
+          .with(ShopifyCli::Constants::StoreKeys::ANALYTICS_ENABLED => true)
+
+        # When/then
         run_cmd("config analytics --enable")
-        assert ShopifyCli::Config.get_bool("analytics", "enabled")
       end
 
       def test_will_disable_analytics_that_is_enabled
-        ShopifyCli::Config.set("analytics", "enabled", true)
+        # Given
+        ShopifyCli::DB.expects(:get)
+          .with(ShopifyCli::Constants::StoreKeys::ANALYTICS_ENABLED)
+          .returns(true)
+        ShopifyCli::DB.expects(:set)
+          .with(ShopifyCli::Constants::StoreKeys::ANALYTICS_ENABLED => false)
+
+        # When/then
         run_cmd("config analytics --disable")
-        refute ShopifyCli::Config.get_bool("analytics", "enabled")
       end
     end
   end
