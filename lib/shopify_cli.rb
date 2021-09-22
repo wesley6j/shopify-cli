@@ -25,6 +25,7 @@ require "cli/ui"
 require "cli/kit"
 require "smart_properties"
 require_relative "shopify_cli/version"
+require_relative "shopify_cli/exception_reporter"
 
 # Enable stdout routing. At this point all calls to STDOUT (and STDERR) will go through this class.
 # See https://github.com/Shopify/cli-ui/blob/main/lib/cli/ui/stdout_router.rb for more info
@@ -90,7 +91,7 @@ module ShopifyCLI
   autocall(:ErrorHandler) do
     CLI::Kit::ErrorHandler.new(
       log_file: ShopifyCLI.log_file,
-      exception_reporter: nil,
+      exception_reporter: ->() { ShopifyCLI::ExceptionReporter },
     )
   end
 
