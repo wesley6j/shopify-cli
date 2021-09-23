@@ -50,3 +50,8 @@ shipping_methods:
   javascript:
     beta: true
     repo: "https://github.com/Shopify/scripts-apis-examples"
+discount_types:
+  domain: 'discounts'
+  javascript:
+    beta: true
+    repo: "https://github.com/Shopify/scripts-apis-examples"
